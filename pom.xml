@@ -12,8 +12,8 @@
     <groupId>com.healthcaregov</groupId>
     <artifactId>healthcaregov-backend</artifactId>
     <version>1.0.0</version>
-    <name>HealthCareGov - Hospital</name>
-    <description>HealthCareGov Backend - Hospital Module</description>
+    <name>HealthCareGov - Compliance</name>
+    <description>HealthCareGov Backend - Compliance Module</description>
     <properties>
         <java.version>21</java.version>
         <jjwt.version>0.12.5</jjwt.version>
@@ -36,15 +36,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <release>21</release>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
