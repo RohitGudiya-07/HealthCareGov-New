@@ -5,7 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Slf4j
@@ -18,7 +18,7 @@ public class JwtUtil {
     @Value("${app.jwt.expiration-ms}")
     private long jwtExpirationMs;
 
-    private Key getSigningKey() {
+    private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
@@ -34,13 +34,13 @@ public class JwtUtil {
     }
 
     public String extractEmail(String token) {
-        return Jwts.parser().verifyWith((javax.crypto.SecretKey) getSigningKey())
+        return Jwts.parser().verifyWith(getSigningKey())
                 .build().parseSignedClaims(token).getPayload().getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().verifyWith((javax.crypto.SecretKey) getSigningKey())
+            Jwts.parser().verifyWith(getSigningKey())
                     .build().parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
