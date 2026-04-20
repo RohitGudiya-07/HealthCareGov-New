@@ -12,8 +12,8 @@
     <groupId>com.healthcaregov</groupId>
     <artifactId>healthcaregov-backend</artifactId>
     <version>1.0.0</version>
-    <name>HealthCareGov - Patient</name>
-    <description>HealthCareGov Backend - Patient Module</description>
+    <name>HealthCareGov - Treatment</name>
+    <description>HealthCareGov Backend - Treatment Module</description>
     <properties>
         <java.version>21</java.version>
         <jjwt.version>0.12.5</jjwt.version>
