@@ -12,8 +12,8 @@
     <groupId>com.healthcaregov</groupId>
     <artifactId>healthcaregov-backend</artifactId>
     <version>1.0.0</version>
-    <name>HealthCareGov - Identity</name>
-    <description>HealthCareGov Backend - Identity Module</description>
+    <name>HealthCareGov - Patient</name>
+    <description>HealthCareGov Backend - Patient Module</description>
     <properties>
         <java.version>21</java.version>
         <jjwt.version>0.12.5</jjwt.version>
@@ -36,21 +36,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
