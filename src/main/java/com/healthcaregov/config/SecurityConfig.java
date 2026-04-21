@@ -27,14 +27,75 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(c -> c.disable())
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(a -> a
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/treatments/**").permitAll()
-                .requestMatchers("/api/v1/hospitals/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .anyRequest().authenticated())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(a -> a
+                        // Public
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+
+                        // Identity — User Management
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/users", "/api/v1/users/**")
+                        .hasAnyRole("HOSPITAL_ADMIN", "GOVERNMENT_AUDITOR")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/v1/users/**")
+                        .hasRole("HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/v1/users/**")
+                        .hasRole("HOSPITAL_ADMIN")
+
+                        // Patient Management
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/patients", "/api/v1/patients/documents")
+                        .hasAnyRole("HOSPITAL_ADMIN", "DOCTOR")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/v1/patients/**")
+                        .hasAnyRole("HOSPITAL_ADMIN", "DOCTOR")
+                        .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/patients/**")
+                        .hasAnyRole("HOSPITAL_ADMIN", "DOCTOR")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/patients/**")
+                        .hasAnyRole("DOCTOR", "HOSPITAL_ADMIN", "COMPLIANCE_OFFICER", "GOVERNMENT_AUDITOR")
+
+                        // Appointments
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/appointments")
+                        .hasAnyRole("PATIENT", "DOCTOR", "HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/appointments/schedules")
+                        .hasAnyRole("DOCTOR", "HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/appointments/schedules/**")
+                        .hasAnyRole("PATIENT", "DOCTOR", "HOSPITAL_ADMIN", "PROGRAM_MANAGER")
+                        .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/appointments/**")
+                        .hasAnyRole("DOCTOR", "HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/appointments/**")
+                        .hasAnyRole("DOCTOR", "HOSPITAL_ADMIN", "PROGRAM_MANAGER", "GOVERNMENT_AUDITOR")
+
+                        // Treatments & Medical Records
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/treatments", "/api/v1/treatments/medical-records")
+                        .hasRole("DOCTOR")
+                        .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/treatments/**")
+                        .hasRole("DOCTOR")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/treatments/**")
+                        .hasAnyRole("DOCTOR", "PATIENT", "COMPLIANCE_OFFICER", "GOVERNMENT_AUDITOR")
+
+                        // Hospital & Resource Management
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/hospitals", "/api/v1/hospitals/resources")
+                        .hasRole("HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/v1/hospitals/**")
+                        .hasRole("HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/v1/hospitals/**")
+                        .hasRole("HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/hospitals/**")
+                        .authenticated()
+
+                        // Compliance & Audits
+                        .requestMatchers("/api/v1/compliance/**")
+                        .hasAnyRole("COMPLIANCE_OFFICER", "GOVERNMENT_AUDITOR")
+
+                        // Reporting
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/reports/**")
+                        .hasAnyRole("PROGRAM_MANAGER", "HOSPITAL_ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/reports/**")
+                        .hasAnyRole("PROGRAM_MANAGER", "HOSPITAL_ADMIN", "GOVERNMENT_AUDITOR", "COMPLIANCE_OFFICER")
+
+                        // Notifications — any authenticated user manages their own
+                        .requestMatchers("/api/v1/notifications/**").authenticated()
+
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
